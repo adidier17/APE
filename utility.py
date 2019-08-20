@@ -4,6 +4,7 @@ import random
 import os
 import sys
 from collections import Counter
+# from sampler import MultinomialSampler
 
 
 #############################
@@ -71,6 +72,7 @@ def generate_mixed_events(events_batch, neg_entity_typeid, num_negatives, type2s
     assert mixed_layout == 'separate' or mixed_layout == 'mixed', mixed_layout
     
     neg_entities = type2sampler[typeid2type[neg_entity_typeid]](total_num_negatives)
+    # print 'inside generate_mixed_events'
     if mixed_layout == 'mixed':
         events_batch_mixed = np.repeat(events_batch, num_negatives + 1, axis=0)
         for i in range(num_negatives):
@@ -111,8 +113,6 @@ def generate_mixed_events(events_batch, neg_entity_typeid, num_negatives, type2s
 # Sampler preparations
 ############################
 
-
-from sampler import MultinomialSampler
 
 def get_entity_sampler(data_column, neg_dist='unigram', batch_mode=True, neg_sampling_power=0.75, rand_seed=0):
     '''
@@ -161,7 +161,7 @@ def get_entity_samplers_and_noise_prob(table_transformed, noise_prob_cal='logkPn
         if gap == 0:
             dists_to_stack.append(dist)
         else:
-            print '[Warning] Adding zero vector to gap of length %d' % gap
+            print('[Warning] Adding zero vector to gap of length %d' % gap)
             dist_gap = np.zeros(gap)
             dists_to_stack.append(dist_gap)
             dists_to_stack.append(dist)

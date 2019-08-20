@@ -62,15 +62,19 @@ def get_model(conf, data_spec):
     loss = conf.loss
 
     X = Input(shape=(num_entity_type,), dtype='int32')
-    sn = Input(shape=(1,), dtype='float32')  # noise score
+    # sn = Input(shape=(1,), dtype='float32')  # noise score
 
-    Emb_entity = Embedding(num_entity, emb_dim, input_length=num_entity_type)
+    Emb_entity = Embedding(num_entity, emb_dim, input_length=num_entity_type) #Is this correct? Shouldn't each categorical var be embedded individually?
     entity_emb = Emb_entity(X)  # (None, num_entity_type, emb_dim)
+    print 'entity emb'
+    print entity_emb
     entity_emb_t = Permute((2, 1))(entity_emb) # (None, emb_dim, num_entity_type)
-    h = Merge(mode='dot', dot_axes=[2, 1])([entity_emb, entity_emb_t])  # (None, num_entity_type, num_entity_type)
+    print 'entity_emb_t'
+    print entity_emb_t
+    h = Merge(mode='dot', dot_axes=[2, 1])([entity_emb, entity_emb_t])  # (None, num_entity_type, num_entity_type), more computation than needed
     #h = merge([entity_emb, entity_emb_t], mode='dot', dot_axes=[1, 2])  # (None, num_entity_type, num_entity_type)
     if conf.no_weight:
-        h = Triangularize(num_entity_type)(h)
+        h = Triangularize(num_entity_type)(h) #then they essentially filter out the lower triangular
         h = Flatten()(h)
         y_pred = Dense(1, trainable=False, init='one', activation='linear')(h)
         y_pred = Bias()(y_pred)
@@ -79,9 +83,12 @@ def get_model(conf, data_spec):
         h = Flatten()(h)
         y_pred = Dense(1, init='one', W_constraint='nonneg')(h)
     if not conf.ignore_noise_dist:
-        y_pred = Lambda(lambda x: x - sn)(y_pred)
+        # y_pred = Lambda(lambda x: x - sn)(y_pred)
+        y_pred = Lambda(lambda x: x )(y_pred)
 
-    model = Model(input=[X, sn], output=[y_pred])
+    model = Model(input=[X], output=[y_pred]) #seems weird bc I don't see sn passed through the model anywhere
+
+    # model = Model(input=[X, sn], output=[y_pred]) #seems weird bc I don't see sn passed through the model anywhere
     #model.compile(optimizer='adam', loss='kld')
     #model.compile(optimizer=SGD(10), loss=get_ranking_loss(loss, batch_size, num_negatives))
     model.compile(optimizer=Adam(0.01), loss=get_ranking_loss(loss, batch_size, num_negatives))
