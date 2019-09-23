@@ -1,3 +1,10 @@
+To run this in a new environment: uninstall and reinstall cython, then
+```
+cd sampler
+bash make.sh
+```
+
+
 This module implements some samplers for python program.
 
 sampler_python: multinomial sampler implemented in python, real slow.
