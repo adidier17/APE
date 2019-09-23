@@ -2,7 +2,7 @@
 This file mainly contains Sampler class, which helps sample from discrete dist.
 '''
 
-import random
+ import random
 import bisect
 import numpy as np
 

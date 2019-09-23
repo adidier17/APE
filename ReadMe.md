@@ -8,6 +8,13 @@ To run it, first install keras + tensorflow/theano. Then, cd into sampler folder
 
 You may refer to demo.ipynb for the usage, and demo_toy/ for a peak of data format.
 
+## Other Installation Notes
+```
+pip install Cython
+cd APE/sampler
+bash make.sh
+```
+
 ##Citation
 
 ```
